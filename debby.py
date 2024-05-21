@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="")
 
 st.title('🧩 Debby')
 st.subheader('Talk about things that matter to you in a safe space')
