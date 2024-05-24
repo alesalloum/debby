@@ -1,8 +1,16 @@
 import streamlit as st
 from openai import OpenAI
 from pathlib import Path
+import streamlit_antd_components as sac
 
-client = OpenAI(api_key="")
+
+client = OpenAI(api_key="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")
+
+# Init prompts
+green_politician_system = "You are a politician that belongs to Vihreät political party. Come up with a character and let user discuss with you. Begin by short introduction."    
+finns_politician_system = "You are a politician that belongs to Perussuomalaiset political party. Come up with a character and let user discuss with you. Begin by short introduction."
+critical_advisor_prompt = "Your job is to comment the discussion I provide you between a politician and voter. Identify some good features, but also be critical. If you spot something that voter should be informed on, please say it. In the end of your response, suggest some follow-up questions that the user may consider asking next."
+response_str = ""
 
 st.title('🧩 Debby')
 st.subheader('Talk about things that matter to you in a safe space')
@@ -12,16 +20,28 @@ with st.expander("Hey there 👋🏼 Please, read me first!"):
         I might not always produce factual content, but I'll try my best - I promise.
     ''')
 
-green_politician_system = "You are a politician that belongs to Vihreät political party. Come up with a character and let user discuss with you. Begin by short introduction."    
+# Initialize the session state for party_toggle if not already set
+if 'party_toggle' not in st.session_state:
+    st.session_state.party_toggle = 'Green Party'
 
-critical_advisor_prompt = "Your job is to comment the discussion I provide you between a politician and voter. Identify some good features, but also be critical. If you spot something that voter should be informed on, please say it. In the end of your response, suggest some follow-up questions that the user may consider asking next."
-
-response_str = ""
+# Initialize messages based on selected politician
+def init_messages():
+    st.session_state.messages = []
+    chosen_politician = green_politician_system if st.session_state.party_toggle == 'Green Party' else finns_politician_system
+    st.session_state.messages = [{"role": "system", "content": chosen_politician}]
 
 # Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    st.session_state.messages = [{"role": "system", "content": green_politician_system}]
+if 'messages' not in st.session_state:
+    init_messages()
+
+# Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
+party_toggle = st.selectbox(
+    label='Choose party',
+    options=['Green Party', 'True Finns'],
+    index=0 if st.session_state.party_toggle == 'Green Party' else 1,
+    key="party_toggle",
+    on_change=init_messages
+)
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages[1:]:
@@ -46,7 +66,12 @@ if prompt := st.chat_input("What is up?"):
     )
     #print(response)
     response_str = f"{response.choices[0].message.content}"
-    # Display assistant response in chat message container
+
+    #party_avatar = st.image("img/logo_finns_16x16.png")
+    #party_avatar = "🌱" if st.session_state.party_toggle == "Green Party" else "🧢"
+
+    # Display assistant response in chat message container    
+    #with st.chat_message("assistant", avatar=party_avatar):
     with st.chat_message("assistant"):
         st.markdown(response_str)
     # Add assistant response to chat history
@@ -73,7 +98,7 @@ with st.sidebar:
     
         #st.session_state.messages.append({"role": "user", "content": critical_advisor_prompt})
 
-        # Generate audio file for the given advisor response
+        # Generate audio file for the given advisor response        
         speech_file_path = Path(__file__).parent / "speech.wav"
         response = client.audio.speech.create(
             model="tts-1",
