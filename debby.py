@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 from pathlib import Path
-import streamlit_antd_components as sac
+import time
 
 
 client = OpenAI(api_key="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")
@@ -87,20 +87,27 @@ if prompt := st.chat_input("What is up?"):
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=st.session_state.messages
-    )
-    #print(response)
-    response_str = f"{response.choices[0].message.content}"
+    with st.spinner():
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=st.session_state.messages
+        )
+        #print(response)
+        response_str = f"{response.choices[0].message.content}"        
 
     #party_avatar = st.image("img/logo_finns_16x16.png")
     #party_avatar = "🌱" if st.session_state.party_toggle == "Green Party" else "🧢"
 
+    # Helper to create a streaming effect
+    def stream_data():
+        for word in response_str.split(" "):
+            yield word + " "
+            time.sleep(0.04)
+
     # Display assistant response in chat message container    
-    #with st.chat_message("assistant", avatar=party_avatar):
+    # with st.chat_message("assistant", avatar=party_avatar):
     with st.chat_message("assistant"):
-        st.markdown(response_str)
+        st.write_stream(stream_data)
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response_str})
     
