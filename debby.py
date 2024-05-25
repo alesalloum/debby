@@ -151,6 +151,13 @@ if st.session_state.sidebar_enabled:
             
             if st.button("Suggest me something", disabled=True):
                 st.write("Generating something...")
+        else:
+            messages_side.chat_message("assistant", avatar="💡").write('''
+            Assistant messages will appear here. 
+            
+            I will help you by analyzing the responses and suggesting follow-up.                   
+            '''
+            )
         
     #if prompt := st.chat_input("Something shady going on?"):
     #    messages_side.chat_message("user").write(prompt)
