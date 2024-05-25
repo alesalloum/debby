@@ -24,24 +24,51 @@ with st.expander("Hey there 👋🏼 Please, read me first!"):
 if 'party_toggle' not in st.session_state:
     st.session_state.party_toggle = 'Green Party'
 
+# Initialize the session state for side bar
+if 'sidebar_enabled' not in st.session_state:
+    st.session_state.sidebar_enabled = True
+
 # Initialize messages based on selected politician
 def init_messages():
     st.session_state.messages = []
     chosen_politician = green_politician_system if st.session_state.party_toggle == 'Green Party' else finns_politician_system
     st.session_state.messages = [{"role": "system", "content": chosen_politician}]
 
+# Callback function for siderbar toggle
+def toggle_sidebar():
+    if st.session_state.sidebar_enabled:
+        st.session_state.sidebar_enabled = False
+    else:
+        st.session_state.sidebar_enabled = True
+
+
 # Initialize chat history
 if 'messages' not in st.session_state:
     init_messages()
 
-# Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
-party_toggle = st.selectbox(
-    label='Choose party',
-    options=['Green Party', 'True Finns'],
-    index=0 if st.session_state.party_toggle == 'Green Party' else 1,
-    key="party_toggle",
-    on_change=init_messages
-)
+
+# Create columns to have party toggle and sidebar switch side by side
+col1, col2, col3 = st.columns([1, 1, 1])  # Adjust the ratio as needed for better alignment
+
+with col1:
+    # Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
+    party_toggle = st.selectbox(
+        label='Choose party',
+        options=['Green Party', 'True Finns'],
+        index=0 if st.session_state.party_toggle == 'Green Party' else 1,
+        key="party_toggle",
+        on_change=init_messages
+    )
+
+with col2:
+    # Inserting empty header just to align the toggle vertically with the party toggle
+    st.header(" ")
+    # Toggle for sidebar
+    st.toggle('Enable Assistant', 
+        value=True, 
+        on_change=toggle_sidebar, 
+        help="Assistant analyzes the discussion and suggests potential follow-up questions."
+    )
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages[1:]:
@@ -86,36 +113,37 @@ def autoplay_audio(file_path: str):
         data = f.read()        
         st.audio(data, autoplay=True)
 
-with st.sidebar:
-    messages_side = st.container(height=600)
+if st.session_state.sidebar_enabled:
+    with st.sidebar:
+        messages_side = st.container(height=600)
 
-    if response_str != "":
+        if response_str != "":
+            
+            response_side = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": f"Evaluate the following response: {response_str}. Be short and to the point. If you feel the response can be challenged, show examples. Propose follow-up questions if it fits the context."}]
+            )
         
-        response_side = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": f"Evaluate the following response: {response_str}. Be short and to the point. If you feel the response can be challenged, show examples. Propose follow-up questions if it fits the context."}]
-        )
-    
-        #st.session_state.messages.append({"role": "user", "content": critical_advisor_prompt})
+            #st.session_state.messages.append({"role": "user", "content": critical_advisor_prompt})
 
-        # Generate audio file for the given advisor response        
-        speech_file_path = Path(__file__).parent / "speech.wav"
-        response = client.audio.speech.create(
-            model="tts-1",
-            voice="alloy",
-            response_format = 'wav',
-            input=response_side.choices[0].message.content
-        )
-        response.stream_to_file(speech_file_path)
+            # Generate audio file for the given advisor response        
+            speech_file_path = Path(__file__).parent / "speech.wav"
+            response = client.audio.speech.create(
+                model="tts-1",
+                voice="alloy",
+                response_format = 'wav',
+                input=response_side.choices[0].message.content
+            )
+            response.stream_to_file(speech_file_path)
 
-        autoplay_audio(speech_file_path)
+            autoplay_audio(speech_file_path)
 
-        
-        messages_side.chat_message("assistant", avatar="💡").write(response_side.choices[0].message.content)
-        
-        
-        if st.button("Suggest me something", disabled=True):
-            st.write("Generating something...")
+            
+            messages_side.chat_message("assistant", avatar="💡").write(response_side.choices[0].message.content)
+            
+            
+            if st.button("Suggest me something", disabled=True):
+                st.write("Generating something...")
         
     #if prompt := st.chat_input("Something shady going on?"):
     #    messages_side.chat_message("user").write(prompt)
