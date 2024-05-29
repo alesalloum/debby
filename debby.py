@@ -71,10 +71,36 @@ response_str = ""
 st.title('🧩 Debby')
 st.subheader('Talk about things that matter to you in a safe space')
 
-with st.expander("Hey there 👋🏼 Please, read me first!"):
+with st.expander("Hey there 👋🏼 Please, **read me first!**"):
     st.write('''
-        I might not always produce factual content, but I'll try my best - I promise.
-    ''')
+        
+    Debby is a conversational agent designed to assist discussions on political and societal topics with AI-generated personas representing two political parties.
+
+    Debby also includes an optional AI advisor that analyzes the discussion and suggests potential follow-up questions.
+
+    **Note:** The discussions are **anonymous** and **chat logs will not be recorded or tracked**.
+
+    **Instructions**
+
+    **PART 1:**
+    1. Begin by having the AI advisor disabled.
+    2. Have a brief discussion with the Green Party political persona regarding the following topics:
+        * Climate change    
+        * Immigration policies
+        * Topic of your own choosing
+    3. Repeat the same process with the True Finns candidate by changing the selection in the _"Choose Party"_ selector.
+
+    **PART 2:**
+    - Now enable the AI advisor by toggling the "Enable Advisor" option.
+    - Repeat the process described in Part 1 with the AI advisor enabled.
+
+    **PART 3:**
+    - Please fill out the questionnaire at: {LINK}.
+
+    _If the user interface becomes slow, please reload the application._
+
+    Thank you for participating in our test!
+        ''')
 
 # Initialize the session state for party_toggle if not already set
 if 'party_toggle' not in st.session_state:
@@ -120,7 +146,7 @@ with col2:
     # Inserting empty header just to align the toggle vertically with the party toggle
     st.header(" ")
     # Toggle for sidebar
-    st.toggle('Enable Assistant', 
+    st.toggle('Enable Advisor', 
         value=True, 
         on_change=toggle_sidebar, 
         help="Assistant analyzes the discussion and suggests potential follow-up questions."
