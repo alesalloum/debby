@@ -4,7 +4,7 @@ from openai import OpenAI
 from pathlib import Path
 import time
 
-
+st.set_page_config(layout="wide")
 client = OpenAI(api_key=st.secrets["openai_apikey"])
 
 # Init prompts
@@ -132,27 +132,25 @@ if 'messages' not in st.session_state:
 # Create columns to have party toggle and sidebar switch side by side
 col1, col2, col3 = st.columns([1, 1, 1])  # Adjust the ratio as needed for better alignment
 
-with col1:
-    with st.expander("", expanded=True):
-        # Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
-        party_toggle = st.selectbox(
-            label='Choose party',
-            options=['Green Party', 'True Finns'],
-            index=0 if st.session_state.party_toggle == 'Green Party' else 1,
-            key="party_toggle",
-            on_change=init_messages
-        )
+with col1:    
+    # Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
+    party_toggle = st.selectbox(
+        label='Choose party',
+        options=['Green Party', 'True Finns'],
+        index=0 if st.session_state.party_toggle == 'Green Party' else 1,
+        key="party_toggle",
+        on_change=init_messages
+    )
 
 with col2:
-    with st.expander("", expanded=True):
-        # Inserting empty header just to align the toggle vertically with the party toggle
-        st.header(" ")
-        # Toggle for sidebar
-        st.toggle('Enable Advisor', 
-            value=True, 
-            on_change=toggle_sidebar, 
-            help="Assistant analyzes the discussion and suggests potential follow-up questions."
-        )
+    # Inserting empty header just to align the toggle vertically with the party toggle
+    st.header(" ")
+    # Toggle for sidebar
+    st.toggle('Enable Advisor', 
+        value=True, 
+        on_change=toggle_sidebar, 
+        help="Assistant analyzes the discussion and suggests potential follow-up questions."
+    )
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages[1:]:
