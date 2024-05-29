@@ -142,6 +142,8 @@ with col1:
     )
 
 with col2:
+    # Inserting empty header just to align the toggle vertically with the party toggle
+    st.write(" ")
     # Toggle for sidebar
     st.toggle('Enable Advisor', 
         value=True, 
