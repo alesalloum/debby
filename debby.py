@@ -4,7 +4,6 @@ from openai import OpenAI
 from pathlib import Path
 import time
 
-st.set_page_config(layout="wide")
 client = OpenAI(api_key=st.secrets["openai_apikey"])
 
 # Init prompts
@@ -130,7 +129,7 @@ if 'messages' not in st.session_state:
 
 
 # Create columns to have party toggle and sidebar switch side by side
-col1, col2, col3 = st.columns([1, 1, 1])  # Adjust the ratio as needed for better alignment
+col1, col2, col3 = st.columns([1, 1, 1], gap="medium")  # Adjust the ratio as needed for better alignment
 
 with col1:    
     # Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
