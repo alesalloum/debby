@@ -129,7 +129,7 @@ if 'messages' not in st.session_state:
 
 
 # Create columns to have party toggle and sidebar switch side by side
-col1, col2, col3 = st.columns([1, 1, 1], gap="small")  # Adjust the ratio as needed for better alignment
+col1, col2, col3 = st.columns([2, 1, 2], gap="small")  # Adjust the ratio as needed for better alignment
 
 with col1:    
     # Create a selectbox for the party toggle (Changing value clears history and re-initializes the messages)
@@ -141,7 +141,7 @@ with col1:
         on_change=init_messages
     )
 
-with col2:
+with col3:
     # Inserting empty header just to align the toggle vertically with the party toggle
     st.header(" ")
     # Toggle for sidebar
