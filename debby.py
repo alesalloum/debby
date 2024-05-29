@@ -3,6 +3,7 @@ import streamlit as st
 from openai import OpenAI
 from pathlib import Path
 import time
+import random
 
 client = OpenAI(api_key=st.secrets["openai_apikey"])
 
@@ -70,8 +71,17 @@ response_str = ""
 st.title('🧩 Debby')
 st.subheader('Talk about things that matter to you in a safe space')
 
+# Generate a random boolean value to control default Advisor value
+if 'random_boolean' not in st.session_state:
+    st.session_state.random_boolean = random.choice([True, False])
+
+advisor_state_1 = "enabled" if (st.session_state.random_boolean) else "disabled"
+advisor_state_2 = "enabled" if not (st.session_state.random_boolean) else "disabled"
+advisor_verb = "enable" if not (st.session_state.random_boolean) else "disable"
+
+
 with st.expander("Hey there 👋🏼 Please, **read me first!**"):
-    st.write('''
+    st.write(f'''
         
     Debby is a conversational agent designed to assist discussions on political and societal topics with AI-generated personas representing two political parties.
 
@@ -82,7 +92,7 @@ with st.expander("Hey there 👋🏼 Please, **read me first!**"):
     **Instructions**
 
     **PART 1:**
-    1. Begin by having the AI advisor disabled.
+    1. Begin by having the AI advisor {advisor_state_1}.
     2. Have a brief discussion with the Green Party political persona regarding the following topics:
         * Climate change    
         * Immigration policies
@@ -90,11 +100,11 @@ with st.expander("Hey there 👋🏼 Please, **read me first!**"):
     3. Repeat the same process with the True Finns candidate by changing the selection in the _"Choose Party"_ selector.
 
     **PART 2:**
-    - Now enable the AI advisor by toggling the "Enable Advisor" option.
-    - Repeat the process described in Part 1 with the AI advisor enabled.
+    - Now {advisor_verb} the AI advisor by toggling the "Enable Advisor" option.
+    - Repeat the process described in Part 1 with the AI advisor {advisor_state_2}.
 
     **PART 3:**
-    - Please fill out the questionnaire at: {LINK}.
+    - Please fill out the questionnaire at: **LINK**.
 
     _If the user interface becomes slow, please reload the application._
 
@@ -107,7 +117,8 @@ if 'party_toggle' not in st.session_state:
 
 # Initialize the session state for side bar
 if 'sidebar_enabled' not in st.session_state:
-    st.session_state.sidebar_enabled = True
+    st.session_state.sidebar_enabled = st.session_state.random_boolean
+
 
 # Initialize messages based on selected politician
 def init_messages():
@@ -147,7 +158,7 @@ with col2:
     st.write(" ")
     # Toggle for sidebar
     st.toggle('Enable Advisor', 
-        value=True, 
+        value=st.session_state.random_boolean, 
         on_change=toggle_sidebar, 
         help="Assistant analyzes the discussion and suggests potential follow-up questions."
     )
