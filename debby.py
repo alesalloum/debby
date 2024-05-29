@@ -1,10 +1,11 @@
+import os
 import streamlit as st
 from openai import OpenAI
 from pathlib import Path
 import time
 
 
-client = OpenAI(api_key="")
+client = OpenAI(api_key=st.secrets["openai_apikey"])
 
 # Init prompts
 green_politician_system = """
