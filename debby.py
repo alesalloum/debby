@@ -104,7 +104,7 @@ with st.expander("Hey there 👋🏼 Please, **read me first!**"):
     - Repeat the process described in Part 1 with the AI advisor {advisor_state_2}.
 
     **PART 3:**
-    - Please fill out the questionnaire at: **LINK**.
+    - Please fill out the questionnaire at: **https://forms.gle/JjJEZsvRAbnZTnzE6**.
 
     _If the user interface becomes slow, please reload the application._
 
